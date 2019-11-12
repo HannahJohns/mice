@@ -254,6 +254,7 @@
 #'
 #'@export
 mice <- function(data, m = 5, 
+                 d=0,
                  method = NULL,
                  predictorMatrix,
                  where = NULL,
@@ -376,7 +377,7 @@ mice <- function(data, m = 5,
   # and iterate...
   from <- 1
   to <- from + maxit - 1
-  q <- sampler(data, m, where, imp, blocks, method, visitSequence, 
+  q <- sampler(data, m, d, where, imp, blocks, method, visitSequence, 
                predictorMatrix, formulas, blots, post, c(from, to), 
                printFlag, ...)
   

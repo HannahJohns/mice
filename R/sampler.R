@@ -1,4 +1,4 @@
-sampler <- function(data, m, where, imp, blocks, method, visitSequence, 
+sampler <- function(data, m, d, where, imp, blocks, method, visitSequence, 
                     predictorMatrix, formulas, blots, post, 
                     fromto, printFlag, ...)
   # The sampler controls the actual Gibbs sampling iteration scheme.
@@ -68,8 +68,9 @@ sampler <- function(data, m, where, imp, blocks, method, visitSequence,
           # (repeated) univariate imputation - type method
           if (univ) {
             for (j in b) {
+              
               imp[[j]][, i] <- 
-                sampler.univ(data = data, r = r, where = where, 
+                sampler.univ(data = data, d=d, r = r, where = where, 
                              type = type, formula = ff, 
                              method = theMethod, 
                              yname = j, k = k, 
@@ -97,10 +98,14 @@ sampler <- function(data, m, where, imp, blocks, method, visitSequence,
             fm <- paste("mice.impute", theMethod, sep = ".")
             if (calltype == "formula")
               imputes <- do.call(fm, args = list(data = data, 
-                                                 formula = ff, ...))
+                                                 formula = ff, 
+                                                 d=d,
+                                                 ...))
             else if (calltype == "type")
               imputes <- do.call(fm, args = list(data = data, 
-                                                 type = type, ...))
+                                                 type = type,
+                                                 d=d,
+                                                 ...))
             else stop("Cannot call function of type ", calltype, 
                       call. = FALSE)
             if (is.null(imputes)) stop("No imputations from ", theMethod, 
@@ -159,7 +164,7 @@ sampler <- function(data, m, where, imp, blocks, method, visitSequence,
 }
 
 
-sampler.univ <- function(data, r, where, type, formula, method, yname, k, 
+sampler.univ <- function(data, d, r, where, type, formula, method, yname, k, 
                          calltype = "type", user, ...) {
   j <- yname[1L]
   
@@ -219,7 +224,7 @@ sampler.univ <- function(data, r, where, type, formula, method, yname, k,
   imputes <- data[wy, j]
   imputes[!cc] <- NA
   
-  args <- c(list(y = y, ry = ry, x = x, wy = wy, type = type), user, list(...))
+  args <- c(list(y = y, ry = ry, x = x, wy = wy, type = type, d=d), user, list(...))
   imputes[cc] <- do.call(f, args = args)
   imputes
 }

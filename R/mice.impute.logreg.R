@@ -43,7 +43,7 @@
 #'@family univariate imputation functions
 #'@keywords datagen
 #'@export
-mice.impute.logreg <- function(y, ry, x, wy = NULL, ...) {
+mice.impute.logreg <- function(y, ry, x, wy = NULL, d, ...) {
   if (is.null(wy)) wy <- !ry
   
   # augment data in order to evade perfect prediction
@@ -67,7 +67,7 @@ mice.impute.logreg <- function(y, ry, x, wy = NULL, ...) {
   beta.star <- beta + rv %*% rnorm(ncol(rv))
   
   # draw imputations
-  p <- 1/(1 + exp(-(x[wy, , drop = FALSE] %*% beta.star)))
+  p <- 1/(1 + exp(-(x[wy, , drop = FALSE] %*% beta.star + d)))
   vec <- (runif(nrow(p)) <= p)
   vec[vec] <- 1
   if (is.factor(y)) {
@@ -103,6 +103,13 @@ mice.impute.logreg <- function(y, ry, x, wy = NULL, ...) {
 #'@keywords datagen
 #'@export
 mice.impute.logreg.boot <- function(y, ry, x, wy =  NULL, ...) {
+  
+  parms <- list(...)
+  d <- 0
+  if(!is.null(parms$d)) d <- parms$d
+  
+  
+  
   if (is.null(wy)) wy <- !ry
   
   # draw a bootstrap sample for yobs and xobs
@@ -127,7 +134,7 @@ mice.impute.logreg.boot <- function(y, ry, x, wy =  NULL, ...) {
   beta.star <- coef(fit)
   
   # draw imputations
-  p <- 1/(1 + exp(-(x[wy, ] %*% beta.star)))
+  p <- 1/(1 + exp(-(x[wy, ] %*% beta.star)+d))
   vec <- (runif(nrow(p)) <= p)
   vec[vec] <- 1
   if (is.factor(y)) {
